@@ -3,6 +3,7 @@ package types_test
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/alice/checkers/x/checkers/rules"
 	"github.com/alice/checkers/x/checkers/testutil"
@@ -18,11 +19,13 @@ const (
 
 func GetStoredGame1() types.StoredGame {
 	return types.StoredGame{
-		Black: alice,
-		Red:   bob,
-		Index: "1",
-		Board: rules.New().String(),
-		Turn:  "b",
+		Black:    alice,
+		Red:      bob,
+		Index:    "1",
+		Board:    rules.New().String(),
+		Turn:     "b",
+		Winner:   rules.PieceStrings[rules.NO_PLAYER],
+		Deadline: types.DeadlineLayout,
 	}
 }
 
@@ -75,6 +78,12 @@ func TestParseGameWrongTurnColor(t *testing.T) {
 	require.Nil(t, game)
 	require.EqualError(t, err, "game cannot be parsed: turn: w")
 	require.EqualError(t, storedGame.Validate(), err.Error())
+}
+
+func TestParseDeadlineCorrect(t *testing.T) {
+	deadline, err := GetStoredGame1().GetDeadlineAsTime()
+	require.Nil(t, err)
+	require.Equal(t, time.Time(time.Date(2006, time.January, 2, 15, 4, 5, 999999999, time.UTC)), deadline)
 }
 
 func TestGameValidateOk(t *testing.T) {
