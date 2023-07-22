@@ -15,7 +15,9 @@ func TestGenesis(t *testing.T) {
 		Params: types.DefaultParams(),
 
 		SystemInfo: types.SystemInfo{
-			NextId: 87,
+			NextId:        87,
+			FifoHeadIndex: "-1",
+			FifoTailIndex: "-1",
 		},
 		StoredGameList: []types.StoredGame{
 			{

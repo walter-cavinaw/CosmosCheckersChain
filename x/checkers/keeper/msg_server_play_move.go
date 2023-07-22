@@ -55,17 +55,25 @@ func (k msgServer) PlayMove(goCtx context.Context, msg *types.MsgPlayMove) (*typ
 		return nil, sdkerrors.Wrapf(types.ErrWrongMove, moveErr.Error())
 	}
 
+	systemInfo, found := k.Keeper.GetSystemInfo(ctx)
+	if !found {
+		panic("SystemInfo not found")
+	}
+
 	storedGame.Winner = rules.PieceStrings[game.Winner()]
 	lastBoard := game.String()
 	if storedGame.Winner == rules.PieceStrings[rules.NO_PLAYER] {
 		storedGame.Board = lastBoard
+		k.Keeper.SendToFifoTail(ctx, &storedGame, &systemInfo)
 	} else {
 		storedGame.Board = ""
+		k.Keeper.RemoveFromFifo(ctx, &storedGame, &systemInfo)
 	}
 	storedGame.Turn = rules.PieceStrings[game.Turn]
 	storedGame.Deadline = types.FormatDeadline(types.GetNextDeadline(ctx))
 	storedGame.MoveCount++
 	k.Keeper.SetStoredGame(ctx, storedGame)
+	k.Keeper.SetSystemInfo(ctx, systemInfo)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(types.MovePlayedEventType,
