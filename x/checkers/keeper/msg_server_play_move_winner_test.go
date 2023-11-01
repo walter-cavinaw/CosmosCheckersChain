@@ -30,10 +30,11 @@ func TestPlayMoveUpToWinner(t *testing.T) {
 		Black:       bob,
 		Red:         carol,
 		Winner:      "b",
-		Deadline:    "0001-01-02 00:00:00 +0000 UTC",
+		Deadline:    "0001-01-01 00:05:00 +0000 UTC",
 		MoveCount:   40,
 		AfterIndex:  "-1",
 		BeforeIndex: "-1",
+		Wager:       0,
 	}, game)
 	events := sdk.StringifyEvents(ctx.EventManager().ABCIEvents())
 	require.Len(t, events, 2)
